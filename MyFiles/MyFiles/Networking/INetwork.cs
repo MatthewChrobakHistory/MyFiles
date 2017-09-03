@@ -2,7 +2,6 @@
 {
     public interface INetwork
     {
-        void Destroy();
-        void SendData(byte[] array);
+        void SendFile(string file);
     }
 }

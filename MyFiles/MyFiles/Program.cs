@@ -1,77 +1,56 @@
-﻿using MyFiles.Networking;
+﻿using MyFiles.Data;
+using MyFiles.Networking;
 using System;
+using System.Threading;
+using System.Windows.Threading;
 
 namespace MyFiles
 {
     public static class Program
     {
-        // Global variables related to the client.
+        // Main window
+        public static AppWindow Window { private set; get; }
+
         public static readonly string StartupPath = AppDomain.CurrentDomain.BaseDirectory;
-        public static readonly string DataPath = Program.StartupPath + "Data\\";
-        public static ClientFlag Flag { private set; get; }
 
-        // The main point of entry for the application.
-        private static void Main(string[] args) {
-
-            // Check the folders and files in the system.
-            FolderSystem.Check();
-
-            // Load the client data.
+        public static void Main(string[] args) {
+            NetworkManager.Initialize();
             DataManager.Load();
 
-            // Start the network.
-            NetworkManager.Initialize();
-
-            // Start the game-loop.
-            Program.GameLoop();
+            var thread = new Thread(StartWindow);
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.IsBackground = false;
+            thread.Start();
         }
 
-        private static void GameLoop() {
-            int tick = 0, tick16 = 0;
-
-            // Mark the client as running, and show the main window.
-            Program.Flag = ClientFlag.Running;
-
-            // Continue to run the game-loop as long as our client
-            // is not closing.
-            while (Program.Flag != ClientFlag.Closing) {
-                tick = Environment.TickCount;
-            }
-
-            // The client will only be destroyed when the flag is set to closing.
-            Program.Destroy();
+        public static void Destroy() {
+            DataManager.Save();
+            Environment.Exit(1);
         }
 
-        public static void Write(string text, bool newline = true) {
-            if (newline) {
-                Console.WriteLine(text);
-            } else {
-                Console.Write(text);
-            }
+        private static void StartWindow() {
+            Window = new AppWindow();
+            Dispatcher.Run();
         }
 
-        public static void SetClientFlag(ClientFlag flag) {
-            // Make sure we can't change the flag if we're already closing.
-            if (Program.Flag == ClientFlag.Closing) {
-                return;
-            }
-
-            Program.Flag = flag;
+        public static void ShowMessage(string title, string message, bool shutdown = false) {
+            Program.title = title;
+            Program.message = message;
+            Program.shutdown = shutdown;
+            var thread = new Thread(ShowMessage);
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.IsBackground = false;
+            thread.Start();
         }
 
-        private static void Destroy() {
-            // Make sure that the game-loop has stopped, and
-            // that we didn't call this on accident.
-            if (Program.Flag != ClientFlag.Closing) {
-                return;
+        private static string title;
+        private static string message;
+        private static bool shutdown;
+        private static void ShowMessage() {
+            new AppMsgWindow(title, message).ShowDialog();
+            if (shutdown) {
+                Environment.Exit(1);
             }
-
-            // Destroy the network so as to let the server know
-            // we disconnected.
-            NetworkManager.Destroy();
-
-            // Before closing the client, save all relevant data.
-            Environment.Exit(0);
         }
     }
 }

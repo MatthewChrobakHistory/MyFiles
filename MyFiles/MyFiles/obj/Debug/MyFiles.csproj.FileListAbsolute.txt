@@ -1,0 +1,15 @@
+C:\Users\Matthew\Copy\Projects\MyFiles\MyFiles\bin\Debug\MyFiles.exe.config
+C:\Users\Matthew\Copy\Projects\MyFiles\MyFiles\bin\Debug\MyFiles.exe
+C:\Users\Matthew\Copy\Projects\MyFiles\MyFiles\bin\Debug\MyFiles.pdb
+C:\Users\Matthew\Copy\Projects\MyFiles\MyFiles\obj\Debug\MyFiles.csprojResolveAssemblyReference.cache
+C:\Users\Matthew\Copy\Projects\MyFiles\MyFiles\obj\Debug\AppWindow.g.cs
+C:\Users\Matthew\Copy\Projects\MyFiles\MyFiles\obj\Debug\MyFiles_MarkupCompile.cache
+C:\Users\Matthew\Copy\Projects\MyFiles\MyFiles\obj\Debug\MyFiles_MarkupCompile.lref
+C:\Users\Matthew\Copy\Projects\MyFiles\MyFiles\obj\Debug\AppWindow.baml
+C:\Users\Matthew\Copy\Projects\MyFiles\MyFiles\obj\Debug\MyFiles.g.resources
+C:\Users\Matthew\Copy\Projects\MyFiles\MyFiles\obj\Debug\MyFiles.Properties.Resources.resources
+C:\Users\Matthew\Copy\Projects\MyFiles\MyFiles\obj\Debug\MyFiles.csproj.GenerateResource.Cache
+C:\Users\Matthew\Copy\Projects\MyFiles\MyFiles\obj\Debug\MyFiles.exe
+C:\Users\Matthew\Copy\Projects\MyFiles\MyFiles\obj\Debug\MyFiles.pdb
+C:\Users\Matthew\Copy\Projects\MyFiles\MyFiles\obj\Debug\AppMsgWindow.g.cs
+C:\Users\Matthew\Copy\Projects\MyFiles\MyFiles\obj\Debug\AppMsgWindow.baml

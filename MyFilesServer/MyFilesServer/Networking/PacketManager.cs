@@ -1,28 +1,25 @@
 ﻿using MyFilesServer.IO;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 
 namespace MyFilesServer.Networking
 {
     public class PacketManager
     {
-        public Dictionary<int, Action<int, byte[]>> PacketHandlers { get; private set; }
+        private delegate void HandleData(int index, byte[] array);
+        private List<HandleData> _handleData;
 
         public PacketManager() {
             // Create the array of data handlers.
-            PacketHandlers = new Dictionary<int, Action<int, byte[]>>();
+            this._handleData = new List<HandleData>((int)Packet.Length);
 
-            // Add all packet handlers at the bottom.
-        }
-
-        private void AddPacket(Action<int, byte[]> packet) {
-            this.PacketHandlers.Add(PacketHandlers.Keys.Count, packet);
+            // Add all packet handlers to the array here.
         }
 
         private byte[] RemovePacketHead(byte[] array) {
             // If the size of the entire buffer is 8, all the packet contains is the head and size.
-            // Packets like that are just initiation packets, and don't actually contain
+            // Packets like that are just initiation packets, and don't actually contin
             // other data. So, what we return won't be manipulated anyways. Return null.
             if (array.Length == 8) {
                 return null;
@@ -38,7 +35,23 @@ namespace MyFilesServer.Networking
             return clippedArray;
         }
 
+        private Net.Client GetClient(int index) {
+            var network = (Net.Network)NetworkManager.Network;
+            if (network._client.Count >= index || index < 0) {
+                return null;
+            } else {
+                return network._client[index];
+            }
+        }
+
         public byte[] HandlePacket(int index, byte[] array) {
+            var client = GetClient(index);
+            if (client.IncomingFile) {
+                HandleFileData(index, client.FileName, client.FileSize, array);
+                return new byte[0];
+            }
+
+
             // Push the bytes into a new databuffer object.
             var packet = new DataBuffer(array);
             bool process = true;
@@ -59,8 +72,8 @@ namespace MyFilesServer.Networking
 
                     // Read the packet head, validate its contents, and invoke its data handler.
                     int head = packet.ReadInt();
-                    if (PacketHandlers.ContainsKey(head)) {
-                        PacketHandlers[head].Invoke(index, RemovePacketHead(array));
+                    if (head >= 0 && head < _handleData.Count) {
+                        _handleData[head].Invoke(index, RemovePacketHead(array));
                     }
 
                     // Re-create the databuffer object with just the excess bytes, and 
@@ -72,19 +85,13 @@ namespace MyFilesServer.Networking
 
                     // Read the packet head, validate its contents, and invoke its data handler.
                     int head = packet.ReadInt();
-                    if (PacketHandlers.ContainsKey(head)) {
-                        PacketHandlers[head].Invoke(index, RemovePacketHead(array));
+                    if (head >= 0 && head < _handleData.Count) {
+                        _handleData[head].Invoke(index, RemovePacketHead(array));
                     }
 
                     // Return an empty array.
                     return new byte[0];
                 } else {
-                    // Display a message if something goes wrong.
-                    if (size > 8192) {
-                        Console.Write("Absurd packet size expected: " + size);
-                        return new byte[0];
-                    }
-
                     // We have less data than we need. There's nothing to process yet.
                     process = false;
                 }
@@ -95,7 +102,22 @@ namespace MyFilesServer.Networking
         }
 
         #region Handling incoming packets
+        private void HandleIncomingFile(int index, byte[] array) {
+            var packet = new DataBuffer(array);
+            var client = GetClient(index);
 
+            client.FileName = packet.ReadString();
+            client.FileSize = packet.ReadLong();
+            client.IncomingFile = true;
+        }
+        private void HandleFileData(int index, string filename, long size, byte[] data) {
+            if (!Directory.Exists(Server.StartupPath + filename)) {
+                Directory.CreateDirectory(Server.StartupPath + filename);
+            }
+            using (var output = File.OpenWrite(Server.StartupPath + filename)) {
+                output.Write(data, 0, data.Length);
+            }
+        }
         #endregion
 
         #region Sending outgoing packets

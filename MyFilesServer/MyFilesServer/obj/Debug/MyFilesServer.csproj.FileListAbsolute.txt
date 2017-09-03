@@ -1,0 +1,5 @@
+C:\Users\Matthew\Copy\Projects\MyFilesServer\MyFilesServer\bin\Debug\MyFilesServer.exe
+C:\Users\Matthew\Copy\Projects\MyFilesServer\MyFilesServer\bin\Debug\MyFilesServer.pdb
+C:\Users\Matthew\Copy\Projects\MyFilesServer\MyFilesServer\obj\Debug\MyFilesServer.csprojResolveAssemblyReference.cache
+C:\Users\Matthew\Copy\Projects\MyFilesServer\MyFilesServer\obj\Debug\MyFilesServer.exe
+C:\Users\Matthew\Copy\Projects\MyFilesServer\MyFilesServer\obj\Debug\MyFilesServer.pdb

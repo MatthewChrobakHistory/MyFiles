@@ -13,6 +13,10 @@ namespace MyFilesServer.Networking.Net
         private SocketSendFlag _sendFlag;
         public bool Connected { private set; get; }
 
+        public long FileSize = 0;
+        public string FileName = "";
+        public bool IncomingFile = false;
+
         // Byte arrays for storing incoming and unprocessed data.
         private byte[] _inBuffer;   // incoming
         private byte[] _unBuffer;   // unprocessed
@@ -20,6 +24,7 @@ namespace MyFilesServer.Networking.Net
         // Wait packet variables.
         private int _ticket;
         private int _servicing;
+
 
         public Client(Socket connection, int index) {
             // Store the socket connection for later use.
@@ -33,7 +38,7 @@ namespace MyFilesServer.Networking.Net
             this.Connected = true;
 
             // Write a message to the console that we accepted a new connection.
-            Console.Write("Accepted a connection at " + this.GetAddress());
+            Server.Write("Accepted a connection at " + this.GetAddress());
 
             // Begin to receive data from the client.
             this._socket.BeginReceive(this._inBuffer, 0, this._inBuffer.Length, SocketFlags.None, new AsyncCallback(ReceiveCallback), index);
@@ -103,13 +108,13 @@ namespace MyFilesServer.Networking.Net
         public void SendData(byte[] array) {
             // Make sure that the socket is connected.
             if (this._socket?.Connected != true) {
-                Console.Write("Tried to send data to disconnected client at " + this.GetAddress());
+                Server.Write("Tried to send data to disconnected client at " + this.GetAddress());
                 return;
             }
 
             // Make sure the data we're sending isn't over the limit.
             if (array.Length > this._socket.SendBufferSize) {
-                Console.Write("Tried to send data bigger than the buffer size at " + array.Length + " bytes at client " + this.GetAddress());
+                Server.Write("Tried to send data bigger than the buffer size at " + array.Length + " bytes at client " + this.GetAddress());
                 return;
             }
 
@@ -205,7 +210,7 @@ namespace MyFilesServer.Networking.Net
             }
 
             // Let the server know a user disconnected.
-            Console.Write("Disconnected user at " + this.GetAddress());
+            Server.Write("Disconnected user at " + this.GetAddress());
 
             // Disconnecting a socket might throw an error if the socket is
             // already disconnected.
@@ -235,6 +240,7 @@ namespace MyFilesServer.Networking.Net
         private string GetAddress() {
             string endpoint = this._socket.RemoteEndPoint.ToString();
             return endpoint.Remove(endpoint.IndexOf(':'));
+
         }
     }
 }
